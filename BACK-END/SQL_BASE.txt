@@ -333,3 +333,7 @@ INSERT INTO palabra (palabra,descripcion, gif)  VALUES ('usar','usar','USAR.gif'
 INSERT INTO palabra (palabra,descripcion, gif)  VALUES ('utilizar','utilizar','UTILIZAR.gif');
 INSERT INTO palabra (palabra,descripcion, gif)  VALUES ('vivienda','vivienda','VIVIENDA.gif');
 INSERT INTO palabra (palabra,descripcion, gif)  VALUES ('yanomas','yanomas','YANOMAS.gif');
+
+INSERT INTO `users`( `name`, `email`, `password`) VALUES ('admin','jcajasp2@est.ups.edu.ec','tesis.root1')
+
+tesis.root

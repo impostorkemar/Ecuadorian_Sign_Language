@@ -1,6 +1,15 @@
 from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker
+from config.conexion import Conexion
 
-engine = create_engine("mysql+pymysql://Ecuadorian_Sign_Language:ESL_P63@localhost:3306/Ecuadorian_Sign_Language")
+# Instanciamos la clase Conexion
+conexion = Conexion()
+
+# Construimos la DATABASE_URL usando las credenciales de la clase Conexion
+DATABASE_URL = f"mysql+pymysql://{conexion.user}:{conexion.pwd}@localhost:3306/{conexion.db_name}"
+
+engine = create_engine(DATABASE_URL)
 meta = MetaData()
 
-conn = engine.connect()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+

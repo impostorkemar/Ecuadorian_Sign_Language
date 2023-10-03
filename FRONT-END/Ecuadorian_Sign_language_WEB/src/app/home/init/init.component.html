@@ -1,0 +1,58 @@
+<div class="app-init">
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+    
+                <!-- Panel izquierdo (side-panel) -->
+                <div class="col-lg-3 col-md-4 col-sm-12 p-5 bg-dark text-light d-flex flex-column justify-content-center align-items-center">
+                    <div class="header2">
+                        <h2>EcuSign</h2>
+                    </div>
+                    
+                    <div class="menu-item" [routerLink]="['/crud_word']">
+                        <img src="assets/icons/add_gif.png" alt="Add Gif"> Add Gif
+                    </div>    
+                    <div class="menu-item" [routerLink]="['/update_word']">           
+                        <img src="assets/icons/update_gif.png" alt="Update Gif"> Update Gif
+                    </div>
+                    <div class="menu-item" [routerLink]="['/crud_database']">
+                        <img src="assets/icons/database_config.png" alt="Database Configuration"> Database Configuration
+                    </div>  
+                </div>
+                
+                <!-- Panel central (textarea y botones) -->
+                <div class="col-lg-5 col-md-6 col-sm-12 p-5">
+                    <div class="header">
+                        <h2>Let's work together for a more inclusive world</h2>
+                        <p>Text translator to Ecuadorian sign language.</p>
+                    </div>
+                    <textarea id="textInputArea" name="textInput" [(ngModel)]="textInput" placeholder="Input Text"></textarea>
+                    <div class="action-buttons">
+                        <button (click)="analyzeTextInput()" class="btn btn-primary">Analyze & Play</button>
+                        <button (click)="stopSlider()" class="btn btn-secondary">Stop</button>
+                    </div>
+                </div>
+    
+                <!-- Panel derecho (carrusel) -->
+                                    
+                <div class="col-lg-4 col-md-4 col-sm-12 p-5">
+                    <div class="gif-display">
+                        <ng-image-slider 
+                            [images]="gifsForSlider" 
+                            [imageSize]="{width: '100%', height: '500px', space: 4}" 
+                            [infinite]="true" 
+                            [autoSlide]="slideSpeed" 
+                            (imageClick)="onImageClick($event)"
+                            #slider>
+                        </ng-image-slider>
+                        <input type="range" min="1" max="10" [(ngModel)]="slideSpeed" class="slider">
+                        <label>Speed: {{ slideSpeed }} seconds</label>
+
+                    </div>      
+                </div>
+    
+            </div>
+        </div>
+    </div>
+</div>
+

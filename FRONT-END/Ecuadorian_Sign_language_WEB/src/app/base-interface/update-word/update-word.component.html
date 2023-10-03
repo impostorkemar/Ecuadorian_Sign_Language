@@ -1,0 +1,77 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            
+            <!-- Panel izquierdo -->
+            <div class="col-md-6 p-5 bg-dark text-light d-flex flex-column justify-content-center align-items-center">
+                <h2 class="my-4">EcuSign</h2>
+                <img src="assets/icons/icons8_Sign_Language_100px.png" alt="EcuSign" class="img-fluid mb-4">
+                <h4 class="my-4">Gif Configuration</h4>
+            </div>
+            
+            <!-- Panel derecho -->
+            <div class="col-md-6 p-5">
+                <h2 class="text-dark mb-4">Update Gif</h2>
+                
+                <form>
+                    <!-- Sección Tipo (Palabra o Caracter) -->
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-control" id="type" [(ngModel)]="selectedType" name="type" (change)="onTypeChange()">
+                            <option value="palabra">palabra</option>
+                            <option value="caracter">caracter</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sección Palabra o Caracter -->
+                    <div class="mb-3">
+                        <label for="wordname" class="form-label">
+                            <img src="assets/icons/icons8_Dictionary_20px.png" alt="Word Icon"> Word/Character
+                        </label>
+                        <select class="form-control" [(ngModel)]="selectedWord" name="selectedWord" (change)="onWordChange()">
+                            <option *ngFor="let item of itemList" [value]="item">{{item}}</option>
+                        </select>
+                        <label for="toTextInput" class="form-label">To:</label>
+                        <input class="form-control" type="text" id="toTextInput" [(ngModel)]="toText" name="toText" placeholder="Nuevo nombre">
+                                             
+                    </div>
+                    
+                    <!-- Sección Descripción -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                          <img src="assets/icons/icons8_Comments_20px.png" alt="Description Icon"> Description
+                        </label>
+                        <input type="text" class="form-control" id="description" 
+                            [(ngModel)]="selectedDescription" [readonly]="selectedType === 'caracter'"
+                            name="description" >
+                    </div>
+                    <img *ngIf="selectedGifPath" [src]="selectedGifPath" alt="Selected Gif" class="gif-image">
+
+                    <!-- Sección para mostrar el nombre del GIF -->
+                    <div class="mb-3">
+                        <label for="gifPath" class="form-label">
+                            <img src="assets/icons/icons8_GIF_20px.png" alt="Gif Icon"> Gif
+                        </label>
+                        <div class="mb-3">                            
+                            <input type="file" class="form-control" id="uploadGif" (change)="onFileSelected($event)" name="uploadGif" accept=".gif">
+                        </div>
+                    </div>
+                    
+                    <!-- Acciones: Editar, Cancelar, Actualizar, Buscar GIF -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-primary" (click)="updateGif()">
+                            <img src="assets/icons/icons8_Edit_20px_2.png" alt="Edit Icon"> Update Gif
+                        </button>                        
+                        <!-- ... (resto del código) -->
+                    <button type="button" class="btn btn-warning" (click)="onCancelClick()">
+                        <img src="assets/icons/icons8_Cancel_20px.png" alt="Cancel Icon"> Cancel
+                    </button>
+
+                        
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

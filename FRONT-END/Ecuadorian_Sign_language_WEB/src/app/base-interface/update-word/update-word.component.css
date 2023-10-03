@@ -1,0 +1,38 @@
+/* Panel de fondo */
+.bg-dark {
+    background-color: rgb(54, 33, 89) !important;
+}
+
+/* Estilos de texto */
+.text-light {
+    color: rgb(204, 204, 204) !important;
+}
+
+.text-dark {
+    color: rgb(54, 33, 89) !important;
+}
+
+/* Iconos y etiquetas */
+.form-label img {
+    margin-right: 10px;
+}
+
+/* Botón */
+.btn-primary {
+    background-color: rgb(54, 33, 89) !important;
+    border-color: rgb(54, 33, 89) !important;
+}
+
+.btn-primary:hover {
+    background-color: rgb(74, 53, 109) !important;
+    border-color: rgb(74, 53, 109) !important;
+}
+
+.gif-image {
+    width: 100%;     /* Ocupa todo el espacio disponible */
+    max-width: 250px; /* Ancho máximo de 250px */
+    height: auto;    /* Se ajustará proporcionalmente al ancho */
+    max-height: 250px; /* Altura máxima de 250px */
+    display: block;  /* Para centrar usando margin */
+    margin: 0 auto;  /* Centra horizontalmente */
+}
