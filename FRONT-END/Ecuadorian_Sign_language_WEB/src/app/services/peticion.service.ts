@@ -78,6 +78,12 @@ export class PeticionService {
     let options = this.createRequestOptions();
     return this.clienteHttp.put(this.API + route, {}, { headers: options });
   }
-    
+
+  analyzeTextForVideos(text: string): Observable<any> {
+    const urlAPI = `${this.API}logic/analyze-text-videos/?text=${encodeURIComponent(text)}`;
+    return this.clienteHttp.post(urlAPI, {}); 
+  }
+
+   
 }
 

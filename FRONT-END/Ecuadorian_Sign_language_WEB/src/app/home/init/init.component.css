@@ -84,3 +84,11 @@ ng-image-slider img {
   width: 400%;  /* Ajusta según tus necesidades */
   height: auto;
 }
+
+video {
+  width: 400px; /* Cambia a tu preferencia */
+  height: auto; /* Cambia a tu preferencia */
+  object-fit: cover; /* Esto asegura que el video cubra el espacio definido sin distorsionarse */
+}
+
+

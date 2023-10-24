@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { PeticionService } from 'src/app/services/peticion.service';
-import { PreloadService } from 'src/app/services/preload.service';  // <-- Añade este import
+import { PreloadService } from 'src/app/services/preload.service';
 
-interface GifForSlider {
-  image: string;
-  thumbImage?: string;
-  title?: string;
+interface VideoInfo {
+    url: string;
+    duration: number;
 }
 
 @Component({
@@ -14,76 +13,138 @@ interface GifForSlider {
   styleUrls: ['./init.component.css']
 })
 export class InitComponent implements OnInit {
-  
+
+  @ViewChild('videoPlayer') videoPlayer!: ElementRef;
+
   textInput: string = "";
-  gifs: string[] = [];
-  gifsForSlider: Array<GifForSlider> = [];
-  tokensWithGifs: any;
-  currentGifName: string = "";
-  
-  private _slideSpeed: number = 4;
-  
+  videos: VideoInfo[] = [{ url: '', duration: 0 }];
+  currentVideoIndex: number = 0;
+  private _slideSpeed: number = 1;
+  public initialized: boolean = false;
+  speedValues: number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
   set slideSpeed(value: number) {
     this._slideSpeed = value;
-    this.gifsForSlider = [...this.gifsForSlider];
+    this.adjustPlaybackRate();
   }
+   
   get slideSpeed(): number {
-      return this._slideSpeed;
+    return this._slideSpeed;
   }
 
-  @ViewChild('slider', { static: false }) slider: ElementRef | undefined;
-
-  constructor(private peticionService: PeticionService, private cdRef: ChangeDetectorRef, private preloadService: PreloadService) { } // <-- Añade el servicio aquí
+  constructor(private peticionService: PeticionService, private cdRef: ChangeDetectorRef, private preloadService: PreloadService) { }
 
   ngOnInit(): void { }
+  
+  onSlideSpeedChange(event: any) {
+    this.slideSpeed = this.speedValues[event.target.value];
+  }
 
-  async analyzeTextInput() {  // <-- Hacemos esta función asíncrona
-    console.log("this.textInput:", this.textInput);
-    this.peticionService.analyzeText(this.textInput as string).subscribe(async response => { // <-- Hacemos la respuesta asíncrona
-      this.tokensWithGifs = response.tokens;
-      this.gifs = this.extractGifsFromTokens(this.tokensWithGifs);
-
-      // Precargar las imágenes
-      await Promise.all(this.gifs.map(gif => this.preloadService.preloadImage(gif)));
-
-      this.gifsForSlider = [{ image: 'assets/transparente.gif', thumbImage: 'assets/transparente.gif' }].concat(
-        this.gifs.map(g => ({
-          image: g, 
-          thumbImage: g,
-          title: g.split('/').pop()?.split('.gif')[0] || ""
-        }))
-      );
-
-      this.cdRef.detectChanges();  // <-- Esto asegura que las detecciones de cambios se ejecuten después de actualizar el array
+  async analyzeTextInput() {
+    this.initialized = true;
+    this.stopVideos();  // Aseguramos que los videos se detengan antes de iniciar una nueva análisis
+    this.peticionService.analyzeTextForVideos(this.textInput as string).subscribe(async response => {
+      const newVideos = this.extractVideosFromTokens(response.tokens);
+      if (newVideos.length > 0) {
+        this.videos = newVideos;
+        await this.playVideos();
+      }
     },
-    error => {
+    (error: any) => {
       console.error("Hubo un error al analizar el texto", error);
     });
   }
-  
-  private extractGifsFromTokens(tokens: any[]): string[] {
-    let allGifs: string[] = [];
+
+  private async playVideos() {
+    await Promise.all(this.videos.map(video => this.preloadService.preloadVideo(video.url)));
+    
+    if (this.videoPlayer) {
+        this.videoPlayer.nativeElement.playbackRate = this.slideSpeed; // Asegurándonos de que la velocidad se establezca aquí
+    }
+
+    const playPromise = this.videoPlayer?.nativeElement.play();
+    if (playPromise !== undefined) {
+        playPromise.catch((error: any) => {
+            console.error("Error al reproducir el video: ", error);
+        });
+    }
+  }
+
+
+  videoEnded() {
+    console.log("El video", this.currentVideoIndex, "ha terminado.");
+    console.log("Velocidad de reproducción actual:", this._slideSpeed);
+
+    if (this.currentVideoIndex + 1 < this.videos.length) {
+        this.currentVideoIndex++;
+        console.log("Intentando reproducir el video", this.currentVideoIndex);
+
+        // Introduzca un pequeño retraso antes de intentar reproducir el siguiente video
+        setTimeout(() => {
+            const playPromise = this.videoPlayer?.nativeElement.play();
+            if (playPromise) {
+                playPromise.then(() => {
+                    console.log("El video", this.currentVideoIndex, "ha comenzado a reproducirse.");
+                    this.adjustPlaybackRate(); // Ajusta la velocidad de reproducción después de que el video comienza a reproducirse
+                }).catch((error: any) => {
+                    console.error("Error al reproducir el video: ", error);
+                });
+            }
+        }, 200);
+        
+    } else {
+        console.log("Todos los videos han terminado.");
+        // Detener y resetear en el último video
+        this.stopVideos();
+        this.initialized = false; // Establecer initialized como false al final del último video
+    }
+  }
+
+  adjustPlaybackRate() {
+      if (this.videoPlayer) {
+          this.videoPlayer.nativeElement.playbackRate = this._slideSpeed;
+          console.log("Ajustando la velocidad de reproducción a:", this._slideSpeed);
+      }
+  }
+
+  private extractVideosFromTokens(tokens: any[]): VideoInfo[] {
+    let allVideos: VideoInfo[] = [];
     tokens.forEach(token => {
-      if (Array.isArray(token.gif)) {
-        allGifs.push(...token.gif);
-      } else {
-        allGifs.push(token.gif);
+      if (token.video.urls && token.video.durations) {
+        token.video.urls.forEach((url: string, index: number) => {
+          allVideos.push({
+            url: url,
+            duration: token.video.durations[index] || 0 
+          });
+        });
+      } else if (token.video.url && token.video.duration) {
+        allVideos.push({
+          url: token.video.url,
+          duration: token.video.duration
+        });
       }
     });
-    return allGifs;
+    return allVideos;
   }
 
-  onImageClick(index: number) {
-    this.setCurrentGifName(index);
+  stopVideos() {
+    
+    if (this.videoPlayer) {
+        this.videoPlayer.nativeElement.pause();
+        this.videoPlayer.nativeElement.currentTime = 0;
+    }
+    this.currentVideoIndex = 0; 
   }
 
-  setCurrentGifName(index: number) {
-    let gifUrl = this.gifs[index];
-    let gifName = gifUrl.split('/').pop()?.split('.gif')[0] || "";  
-    this.currentGifName = gifName;
+  Reset(){
+    this.textInput = "";
+    this.initialized = false;   
   }
+ 
 
-  stopSlider() {
-    this.gifsForSlider = [];
+  getVideoName(url: string | undefined): string {
+    if (!url) return "";
+    const name = url.split('/').pop()?.split('.mp4')[0];
+    return name || "";
   }
 }
