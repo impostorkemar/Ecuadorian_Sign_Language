@@ -336,4 +336,6 @@ INSERT INTO palabra (palabra,descripcion, video) VALUES ('yanomas','yanomas','YA
 
 INSERT INTO `users`( `name`, `email`, `password`) VALUES ('admin','jcajasp2@est.ups.edu.ec','tesis.root1')
 
-tesis.root
+USER=Ecuadorian_Sign_Language
+PWD=tesis.root
+DB_NAME=ecuadorian_Sign_Language
