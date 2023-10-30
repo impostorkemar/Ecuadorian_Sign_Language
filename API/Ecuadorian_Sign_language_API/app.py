@@ -9,7 +9,8 @@ app = FastAPI()
 origins =[    
     #"http://localhost:8000",  
     "http://0.0.0.0:0000",
-    "https://0.0.0.0:0000"    
+    "https://0.0.0.0:0000",
+    "http://localhost:4200",    
 ]
 
 #adding middleware uris

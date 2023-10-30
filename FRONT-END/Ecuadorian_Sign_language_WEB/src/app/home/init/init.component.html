@@ -9,15 +9,23 @@
                         <h2>EcuSign</h2>
                     </div>
                     
-                    <div class="menu-item" [routerLink]="['/crud_word']">
+                    <div class="menu-item" *ngIf="loggedIn" [routerLink]="['/crud_word']">
                         <img src="assets/icons/add_gif.png" alt="Agregar Gif"> Agregar Gif
                     </div>    
-                    <div class="menu-item" [routerLink]="['/update_word']">           
+                    <div class="menu-item" *ngIf="loggedIn" [routerLink]="['/update_word']">           
                         <img src="assets/icons/update_gif.png" alt="Actualizar Gif"> Actualizar Gif
                     </div>
-                    <div class="menu-item" [routerLink]="['/crud_database']">
+                    <div class="menu-item" *ngIf="loggedIn" [routerLink]="['/crud_database']">
                         <img src="assets/icons/database_config.png" alt="Configuración de la Base de Datos"> Configuración de Base de Datos
                     </div>  
+
+                    <!-- Botón para Iniciar sesión -->
+                    <button *ngIf="!loggedIn" (click)="openLoginDialog()">Iniciar sesión</button>
+
+                    <!-- Botón para Desconectar -->
+                    <button *ngIf="loggedIn" (click)="logout()">Desconectar</button>
+                    
+                    
                 </div>
                 
                 <!-- Panel central (área de texto y botones) -->
@@ -42,12 +50,11 @@
                         <!-- Reproductor de video integrado aquí -->
                         <ng-container *ngIf="initialized && videos[currentVideoIndex]">
                             <video #videoPlayer (ended)="videoEnded()" [src]="videos[currentVideoIndex].url" controls autoplay></video>
-                            <!-- Información sobre el video (opcional) -->
-                            <div>
-                                <p>Nombre del video: {{ getVideoName(videos[currentVideoIndex].url) }}</p>
-                                <p>Duración actual del video: {{ videos[currentVideoIndex].duration }} s</p>
+                           <!-- Información sobre el video posicionada en la parte inferior del video -->
+                            <div class="video-caption">
+                                {{ getVideoName(videos[currentVideoIndex].url) }}
                             </div>
-                        </ng-container>
+                        </ng-container>                        
                     </div>      
                 </div>
             </div>

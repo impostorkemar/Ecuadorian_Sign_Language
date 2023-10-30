@@ -177,10 +177,10 @@ def find_video_for_token(token_type: str, value: str, base_url: str):
         if token_type == "PALABRA":
             result = session.query(palabra).filter(palabra.c.palabra == value).first()
             if result:
-                path_to_video = os.path.join(BASE_VIDEO_PATH, "palabras", result.gif.replace(".gif", ".mp4"))
-                duration = video_duration(path_to_video)
+                path_to_video = os.path.join(BASE_VIDEO_PATH, "palabras", result.video)
+                duration = video_duration(path_to_video)  # Asegúrate de tener una función similar a gif_duration pero para videos
                 return {
-                    "url": f"{base_url}/videos/palabras/{result.gif.replace('.gif', '.mp4')}",
+                    "url": f"{base_url}/videos/palabras/{result.video}",
                     "duration": duration
                 }
             else:
@@ -189,9 +189,9 @@ def find_video_for_token(token_type: str, value: str, base_url: str):
                 for char in value:
                     char_result = session.query(caracter).filter(caracter.c.caracter == char).first()
                     if char_result:
-                        path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", char_result.gif.replace(".gif", ".mp4"))
+                        path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", char_result.video)
                         duration = video_duration(path_to_video)
-                        videos.append(f"{base_url}/videos/caracteres/{char_result.gif.replace('.gif', '.mp4')}")
+                        videos.append(f"{base_url}/videos/caracteres/{char_result.video}")
                         durations.append(duration)
                     else:
                         videos.append(f"{base_url}/videos/caracteres/vacio.mp4")
@@ -204,14 +204,15 @@ def find_video_for_token(token_type: str, value: str, base_url: str):
         elif token_type in ["LETRA", "DIGITO"]:
             result = session.query(caracter).filter(caracter.c.caracter == value).first()
             if result:
-                path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", result.gif.replace(".gif", ".mp4"))
+                path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", result.video)
                 duration = video_duration(path_to_video)
                 return {
-                    "url": f"{base_url}/videos/caracteres/{result.gif.replace('.gif', '.mp4')}",
+                    "url": f"{base_url}/videos/caracteres/{result.video}",
                     "duration": duration
                 }
     finally:
         session.close()
+
 
 
 @lexer_router.post("/analyze-text-videos/", tags=["logic"])

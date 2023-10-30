@@ -36,3 +36,9 @@
     display: block;  /* Para centrar usando margin */
     margin: 0 auto;  /* Centra horizontalmente */
 }
+
+video {
+    width: 250px; /* Cambia a tu preferencia */
+    height: auto; /* Cambia a tu preferencia */
+    object-fit: cover; /* Esto asegura que el video cubra el espacio definido sin distorsionarse */
+  }

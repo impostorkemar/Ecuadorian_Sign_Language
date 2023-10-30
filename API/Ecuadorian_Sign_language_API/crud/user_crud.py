@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response, HTTPException
 from config.db import engine
 from models.user import users, palabra, caracter
-from schemas.user import User, Palabra, Caracter
+from schemas.user import User, Palabra, Caracter, UserLogin, UserResponse
 from cryptography.fernet import Fernet
 from starlette import status
 from sqlalchemy.sql import select
@@ -163,8 +163,6 @@ def update_palabra(
     
     return {"palabra": palabra_text, "descripcion": descripcion, "gif": nameGif, "id_palabra": palabra_id}
 
-
-
 @palabra_crud.delete("/palabra/{palabra_id}", tags=["palabra"])
 async def delete_palabra(palabra_id: int):
     conn = engine.connect()
@@ -246,3 +244,172 @@ async def delete_caracter(caracter_id: int):
     if not result.rowcount:
         raise HTTPException(status_code=404, detail="Caracter not found")
     return {"status": "Caracter deleted successfully"}
+
+
+@palabra_crud.post("/palabra/video/", response_model=Palabra, tags=["palabra"])
+async def create_palabra_video(palabraAux: str, descripcionAux: str, video: UploadFile = File(...)):
+    conn = engine.connect()
+    try:
+        nameVideo = palabraAux.upper() + ".mp4"
+        
+        # Guardar el archivo en la carpeta deseada
+        with open(f"videos/palabras/{nameVideo}", "wb") as buffer:
+            shutil.copyfileobj(video.file, buffer)
+        
+        new_item = {
+            "palabra": palabraAux,
+            "descripcion": descripcionAux,
+            "video": nameVideo  # Guardamos solo el nombre del video en la base de datos
+        }
+        result = conn.execute(palabra.insert().values(**new_item))
+        conn.commit() 
+        
+        new_item["id_palabra"] = result.inserted_primary_key[0]
+        item = Palabra(**new_item)
+        
+        return item
+    finally:
+        conn.close()
+
+@caracter_crud.post("/caracter/video/", tags=["caracter"])
+async def create_caracter_video(caracter_text: str, video: UploadFile = File(...)):
+    conn = engine.connect()
+    nameVideo = caracter_text.upper() + ".mp4"
+    
+    # Guardar el archivo en la carpeta deseada
+    with open(f"videos/caracteres/{nameVideo}", "wb") as buffer:
+        shutil.copyfileobj(video.file, buffer)
+    
+    new_item = {
+        "caracter": caracter_text,
+        "gif": nameVideo  # Guardamos solo el nombre del video en la base de datos
+    }
+    result = conn.execute(caracter.insert().values(**new_item))
+    conn.close()
+    
+    return {"caracter": caracter_text, "gif": nameVideo, "id_caracter": result.inserted_primary_key[0]}
+
+@palabra_crud.get("/palabra/video/exist/{palabraAux}", tags=["palabra"])
+async def check_word_exists_video(palabraAux: str):
+    conn = engine.connect()
+    result = conn.execute(palabra.select().where(palabra.c.palabra == palabraAux)).first()
+    conn.close()
+    if result:
+        return {"exists": True}
+    return {"exists": False}
+
+@palabra_crud.put("/palabra/video/{palabra_id}", response_model=Palabra, tags=["palabra"])
+def update_palabra_video(
+    palabra_id: int, 
+    palabra_text: str,
+    descripcion: str,    
+    video: UploadFile = File(...)
+):
+    conn = engine.connect()
+    trans = conn.begin()  # Iniciar la transacción
+    
+    try:
+        # Paso 1: Consulta el nombre del archivo video anterior
+        current_video_data = get_palabra_by_id(palabra_id)
+        columns = ["id_palabra", "palabra", "descripcion", "video"]
+        current_video_data_dict = dict(zip(columns, current_video_data))
+        current_video_name = current_video_data_dict["video"]
+
+        # Paso 2: Si el nombre del archivo video anterior existe, elimínalo
+        if current_video_name:
+            current_video_path = Path(f"videos/palabras/{current_video_name}")
+            if current_video_path.exists():
+                current_video_path.unlink()
+
+        # Paso 3: Carga y guarda el nuevo video
+        nameVideo = palabra_text.upper() + ".mp4"
+        with open(f"videos/palabras/{nameVideo}", "wb") as buffer:
+            shutil.copyfileobj(video.file, buffer)
+
+        result = conn.execute(palabra.update().where(palabra.c.id_palabra == palabra_id).values(
+            palabra=palabra_text, descripcion=descripcion, video=nameVideo
+        ))
+
+        # Realizar commit para asegurar los cambios en la base de datos
+        trans.commit()
+        
+    except Exception as e:
+        trans.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    finally:
+        conn.close()
+    
+    if not result.rowcount:
+        raise HTTPException(status_code=404, detail="Palabra not found")
+    
+    return {"palabra": palabra_text, "descripcion": descripcion, "video": nameVideo, "id_palabra": palabra_id}
+
+@caracter_crud.put("/caracter/video/{caracter_id}", response_model=Caracter, tags=["caracter"])
+def update_caracter_video(
+    caracter_id: int, 
+    caracter_text: str, 
+    video: UploadFile = File(...)
+):
+    conn = engine.connect()
+    trans = conn.begin()  # Iniciar la transacción
+    
+    try:
+        # Paso 1: Consulta el nombre del video anterior
+        current_video_data = get_caracter_by_id(caracter_id)
+        columns = ["id_caracter", "caracter", "video"]
+        current_video_data_dict = dict(zip(columns, current_video_data))
+        current_video_name = current_video_data_dict["video"]
+
+        # Paso 2: Si el nombre del video anterior existe, elimínalo
+        if current_video_name:
+            current_video_path = Path(f"videos/caracteres/{current_video_name}")
+            if current_video_path.exists():
+                current_video_path.unlink()
+
+        # Paso 3: Carga y guarda el nuevo video
+        nameVideo = caracter_text.upper() + ".mp4"
+        with open(f"videos/caracteres/{nameVideo}", "wb") as buffer:
+            shutil.copyfileobj(video.file, buffer)
+
+        result = conn.execute(caracter.update().where(caracter.c.id_caracter == caracter_id).values(
+            caracter=caracter_text, video=nameVideo
+        ))
+
+        # Realizar commit para asegurar los cambios en la base de datos
+        trans.commit()
+        
+    except Exception as e:
+        trans.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    finally:
+        conn.close()
+    
+    if not result.rowcount:
+        raise HTTPException(status_code=404, detail="Caracter not found")
+    
+    return {"caracter": caracter_text, "video": nameVideo, "id_caracter": caracter_id}
+
+@user_crud.post("/login/", response_model=UserResponse, tags=["users"])
+async def login(user: UserLogin):
+    conn = engine.connect()
+    
+    result = conn.execute(users.select().where(users.c.email == user.email)).first()
+    conn.close()
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db_user = {
+        "id": result[0],
+        "name": result[1],
+        "email": result[2],
+        "password": result[3]
+    }
+    
+    if db_user["password"] != user.password:
+        raise HTTPException(status_code=401, detail="Incorrect password")
+    
+    return {"email": user.email, "role": "admin"}
+

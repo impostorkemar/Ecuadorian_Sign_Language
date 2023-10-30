@@ -31,18 +31,18 @@ export class CrudWordComponent implements OnInit {
           const file = input.files[0];
           const fileType = file.type;
 
-          // Comprueba si el tipo de archivo es .gif
-          if (fileType === 'image/gif') {
-              this.selectedFile = file;
-              // Aquí puedes agregar más lógica si necesitas hacer algo más con el archivo
-          } else {
-              this.openDialog('Error', 'Por favor, sube solo archivos .gif');
-              // Reset the input field if needed
-              if (input) {
-                  input.value = '';
-              }
-              this.selectedFile = null;
-          }
+          // Comprueba si el tipo de archivo es .mp4
+        if (fileType === 'video/mp4') {
+            this.selectedFile = file;
+            // Aquí puedes agregar más lógica si necesitas hacer algo más con el archivo
+        } else {
+            this.openDialog('Error', 'Por favor, sube solo archivos .mp4');
+            // Reset the input field if needed
+            if (input) {
+                input.value = '';
+            }
+            this.selectedFile = null;
+        }
       }
   }
 
@@ -80,7 +80,7 @@ export class CrudWordComponent implements OnInit {
       // Añade la palabra, descripción y archivo al FormData
       formData.append('palabra', this.txt_wordname);
       formData.append('descripcion', this.txt_description);
-      formData.append('gif', this.selectedFile, this.selectedFile.name);
+      formData.append('video', this.selectedFile, this.selectedFile.name);
   
       this.peticionService.addWord(this.txt_wordname, this.txt_description, formData).subscribe(
           response => {

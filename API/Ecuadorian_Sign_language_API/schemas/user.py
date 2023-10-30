@@ -10,15 +10,23 @@ class User(BaseModel):
 class Palabra(BaseModel):
     id_palabra: Optional[int]
     palabra: str
-    descripcion: str
-    gif: str
+    descripcion: str    
+    video: str
 
 class Caracter(BaseModel):
     id_caracter: Optional[int]
-    caracter: str
-    gif: str
+    caracter: str    
+    video: str
 
 class DatabaseConfig(BaseModel):
     USER: str
     PWD: str
     DB_NAME: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    email: str
+    role: str

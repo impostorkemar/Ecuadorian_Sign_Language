@@ -1,6 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from 'src/app/services/auth.service';
+import { PopupComponent } from 'src/app/popup/popup.component';
 import { PeticionService } from 'src/app/services/peticion.service';
 import { PreloadService } from 'src/app/services/preload.service';
+
 
 interface VideoInfo {
     url: string;
@@ -13,6 +17,8 @@ interface VideoInfo {
   styleUrls: ['./init.component.css']
 })
 export class InitComponent implements OnInit {
+
+  loggedIn: boolean = false; 
 
   @ViewChild('videoPlayer') videoPlayer!: ElementRef;
 
@@ -32,9 +38,18 @@ export class InitComponent implements OnInit {
     return this._slideSpeed;
   }
 
-  constructor(private peticionService: PeticionService, private cdRef: ChangeDetectorRef, private preloadService: PreloadService) { }
+  constructor(
+    private peticionService: PeticionService, 
+    private cdRef: ChangeDetectorRef, 
+    private preloadService: PreloadService,
+    private dialog: MatDialog, 
+    private authService: AuthService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Comprobar si el usuario ya está autenticado al cargar el componente
+    this.loggedIn = this.authService.isLoggedIn();
+  }
+  
   
   onSlideSpeedChange(event: any) {
     this.slideSpeed = this.speedValues[event.target.value];
@@ -72,19 +87,19 @@ export class InitComponent implements OnInit {
 
 
   videoEnded() {
-    console.log("El video", this.currentVideoIndex, "ha terminado.");
-    console.log("Velocidad de reproducción actual:", this._slideSpeed);
+    //console.log("El video", this.currentVideoIndex, "ha terminado.");
+    //console.log("Velocidad de reproducción actual:", this._slideSpeed);
 
     if (this.currentVideoIndex + 1 < this.videos.length) {
         this.currentVideoIndex++;
-        console.log("Intentando reproducir el video", this.currentVideoIndex);
+        //console.log("Intentando reproducir el video", this.currentVideoIndex);
 
         // Introduzca un pequeño retraso antes de intentar reproducir el siguiente video
         setTimeout(() => {
             const playPromise = this.videoPlayer?.nativeElement.play();
             if (playPromise) {
                 playPromise.then(() => {
-                    console.log("El video", this.currentVideoIndex, "ha comenzado a reproducirse.");
+                    //console.log("El video", this.currentVideoIndex, "ha comenzado a reproducirse.");
                     this.adjustPlaybackRate(); // Ajusta la velocidad de reproducción después de que el video comienza a reproducirse
                 }).catch((error: any) => {
                     console.error("Error al reproducir el video: ", error);
@@ -93,7 +108,7 @@ export class InitComponent implements OnInit {
         }, 200);
         
     } else {
-        console.log("Todos los videos han terminado.");
+        //console.log("Todos los videos han terminado.");
         // Detener y resetear en el último video
         this.stopVideos();
         this.initialized = false; // Establecer initialized como false al final del último video
@@ -103,7 +118,7 @@ export class InitComponent implements OnInit {
   adjustPlaybackRate() {
       if (this.videoPlayer) {
           this.videoPlayer.nativeElement.playbackRate = this._slideSpeed;
-          console.log("Ajustando la velocidad de reproducción a:", this._slideSpeed);
+          //console.log("Ajustando la velocidad de reproducción a:", this._slideSpeed);
       }
   }
 
@@ -147,4 +162,25 @@ export class InitComponent implements OnInit {
     const name = url.split('/').pop()?.split('.mp4')[0];
     return name || "";
   }
+
+  openLoginDialog(): void {
+    const dialogRef = this.dialog.open(PopupComponent, {
+      width: '400px',
+      data: { 
+        title: 'Inicio de sesión', 
+        message: 'Por favor, ingrese sus credenciales',
+        isLoginForm: true  // Indica que este diálogo es un formulario de inicio de sesión
+      }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      this.loggedIn = this.authService.isLoggedIn();
+    });
+  }
+
+  logout() {
+    this.authService.logout();
+    this.loggedIn = false;
+  }
+
 }

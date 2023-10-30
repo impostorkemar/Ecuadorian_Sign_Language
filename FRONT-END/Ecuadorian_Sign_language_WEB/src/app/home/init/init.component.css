@@ -86,9 +86,24 @@ ng-image-slider img {
 }
 
 video {
-  width: 400px; /* Cambia a tu preferencia */
+  width: 500px; /* Cambia a tu preferencia */
   height: auto; /* Cambia a tu preferencia */
   object-fit: cover; /* Esto asegura que el video cubra el espacio definido sin distorsionarse */
 }
 
+/* Estilos para el nombre del video dentro del cuadro del video */
+.video-display {
+    position: relative;
+}
 
+.video-caption {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    color: #fff;  /* Color del texto */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 2em; /* Tamaño de texto grande */
+}

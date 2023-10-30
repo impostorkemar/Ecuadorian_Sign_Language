@@ -11,13 +11,13 @@ interface Word {
   id_palabra: number;
   palabra: string;
   descripcion: string;
-  gif: string;
+  video: string;
 }
 
 interface Character {
   id_caracter: number;
   caracter: string;
-  gif: string;
+  video: string;
 }
 
 @Component({
@@ -60,32 +60,33 @@ export class UpdateWordComponent implements OnInit {
     }
   }
 
-    fetchWordsAndCaracteres(): void {
-      this.peticionService.getAllPalabras().pipe(
-        concatMap(palabras => {
-          this.wordsList = palabras;
-          this.itemList = this.wordsList.map(p => p.palabra);
-          return this.peticionService.getAllCaracteres();
-        })
-      ).subscribe(caracteres => {
-        this.caracterList = caracteres;
-        this.itemList = this.caracterList.map(c => c.caracter);
-        this.onTypeChange();
-      });
-    }
-
+  fetchWordsAndCaracteres(): void {
+    this.peticionService.getAllPalabras().pipe(
+      concatMap(palabras => {
+        this.wordsList = palabras;
+        //console.log('Palabras obtenidas:', this.wordsList);  // <-- Añadido
+        this.itemList = this.wordsList.map(p => p.palabra);
+        return this.peticionService.getAllCaracteres();
+      })
+    ).subscribe(caracteres => {
+      this.caracterList = caracteres;
+      //console.log('Caracteres obtenidos:', this.caracterList);  // <-- Añadido
+      this.itemList = this.caracterList.map(c => c.caracter);
+      this.onTypeChange();
+    });
+  }
 
   onTypeChange(): void {
     if (this.selectedType === 'palabra' && this.wordsList.length > 0) {
         this.itemList = this.wordsList.map(p => p.palabra);
         this.selectedWord = this.itemList[0];
-        this.selectedGifPath = `http://127.0.0.1:8000/gifs/palabras/${this.wordsList[0].gif}`;
-        this.gifPath = this.wordsList[0].gif;  // Aquí asignas el nombre del archivo
+        this.selectedGifPath = `http://127.0.0.1:8000/videos/palabras/${this.wordsList[0].video}`;
+        this.gifPath = this.wordsList[0].video;  // Aquí asignas el nombre del archivo
     } else if (this.selectedType === 'caracter' && this.caracterList.length > 0) {
         this.itemList = this.caracterList.map(c => c.caracter);
         this.selectedWord = this.itemList[0];
-        this.selectedGifPath = `http://127.0.0.1:8000/gifs/caracteres/${this.caracterList[0].gif}`;
-        this.gifPath = this.caracterList[0].gif;  // Aquí asignas el nombre del archivo
+        this.selectedGifPath = `http://127.0.0.1:8000/videos/caracteres/${this.caracterList[0].video}`;
+        this.gifPath = this.caracterList[0].video;  // Aquí asignas el nombre del archivo
     }
     this.updateDescription();
   }
@@ -94,13 +95,13 @@ export class UpdateWordComponent implements OnInit {
       if (this.selectedType === 'palabra') {
           const selectedWordObj = this.wordsList.find(wordObj => wordObj.palabra === this.selectedWord);
           this.selectedDescription = selectedWordObj ? selectedWordObj.descripcion : '';
-          this.selectedGifPath = `http://127.0.0.1:8000/gifs/palabras/${selectedWordObj?.gif}`;
-          this.gifPath = selectedWordObj?.gif ?? '';  // Aquí asignas el nombre del archivo
+          this.selectedGifPath = `http://127.0.0.1:8000/videos/palabras/${selectedWordObj?.video}`;
+          this.gifPath = selectedWordObj?.video ?? '';  // Aquí asignas el nombre del archivo
       } else {
           const selectedCaracterObj = this.caracterList.find(carObj => carObj.caracter === this.selectedWord);
           this.selectedDescription = '';
-          this.selectedGifPath = `http://127.0.0.1:8000/gifs/caracteres/${selectedCaracterObj?.gif}`;
-          this.gifPath = selectedCaracterObj?.gif ?? '';  // Aquí asignas el nombre del archivo
+          this.selectedGifPath = `http://127.0.0.1:8000/videos/caracteres/${selectedCaracterObj?.video}`;
+          this.gifPath = selectedCaracterObj?.video ?? '';  // Aquí asignas el nombre del archivo
       }
   }
 
@@ -128,7 +129,7 @@ export class UpdateWordComponent implements OnInit {
         const fileType = file.type;
   
         // Comprueba si el tipo de archivo es .gif
-        if (fileType === 'image/gif') {
+        if (fileType === 'video/mp4') {
             this.selectedFile = file;
             // Si deseas actualizar la variable gifPath con el nombre del archivo:
             this.gifPath = file.name;
@@ -143,40 +144,45 @@ export class UpdateWordComponent implements OnInit {
     }
   }
 
-  updateGif(): void {
+  updateVideo(): void {
+    console.log('Iniciando actualización...');  // <-- Añadido
     if (!this.selectedFile) {
-        this.openDialog('Error', 'Por favor, selecciona un archivo .gif para subir');
+        this.openDialog('Error', 'Por favor, selecciona un archivo .mp4 para subir');
         return;
     }
 
-    // Considerar el valor de toText si está presente
     const wordOrCharToUpdate = this.toText ? this.toText : this.selectedWord;
+    console.log('Elemento a actualizar:', wordOrCharToUpdate);  // <-- Añadido
 
     const formData: FormData = new FormData();
-    formData.append('gif', this.selectedFile, this.selectedFile.name);
+    formData.append('video', this.selectedFile, this.selectedFile.name);
 
     let uploadObservable: Observable<any> | undefined;
 
     if (this.selectedType === 'palabra') {
         const selectedWordObj = this.wordsList.find(wordObj => wordObj.palabra === this.selectedWord);
         if (selectedWordObj) {
-            uploadObservable = this.peticionService.updatePalabraGif(selectedWordObj.id_palabra, wordOrCharToUpdate, this.selectedDescription, formData);
+            console.log('Actualizando palabra:', selectedWordObj);  // <-- Añadido
+            uploadObservable = this.peticionService.updatePalabraVideo(selectedWordObj.id_palabra, wordOrCharToUpdate, this.selectedDescription, formData);
         }
     } else if (this.selectedType === 'caracter') {
         const selectedCaracterObj = this.caracterList.find(carObj => carObj.caracter === this.selectedWord);
         if (selectedCaracterObj) {
-            uploadObservable = this.peticionService.updateCaracterGif(selectedCaracterObj.id_caracter, wordOrCharToUpdate, formData);
+            console.log('Actualizando caracter:', selectedCaracterObj);  // <-- Añadido
+            uploadObservable = this.peticionService.updateCaracterVideo(selectedCaracterObj.id_caracter, wordOrCharToUpdate, formData);
         }
     }
 
     if(uploadObservable) {
-        uploadObservable?.subscribe(
+        uploadObservable.subscribe(
           (response: any) => {
-            location.reload();  // Esto recargará la página por completo
-              this.openDialog('Éxito', 'Gif actualizado exitosamente');
-             
+            console.log('Respuesta de la actualización:', response);  // <-- Añadido
+            this.fetchWordsAndCaracteres();
+            //location.reload();
+            this.openDialog('Éxito', 'Video actualizado exitosamente');
           },
           (error: any) => {
+              console.error('Error en la actualización:', error);  // <-- Añadido
               const entityType = this.selectedType === 'palabra' ? 'de la palabra' : 'del caracter';
               this.openDialog('Error', `Hubo un error al actualizar el gif ${entityType}`);
           }
@@ -185,5 +191,6 @@ export class UpdateWordComponent implements OnInit {
         console.error("uploadObservable no está definido");
     }
   }
+
   
 }

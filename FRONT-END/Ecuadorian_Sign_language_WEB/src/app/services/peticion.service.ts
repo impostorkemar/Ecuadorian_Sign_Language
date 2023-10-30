@@ -41,7 +41,7 @@ export class PeticionService {
   }
 
   addWord(palabraAux: string, descripcionAux: string, wordData: FormData): Observable<any> {
-    return this.clienteHttp.post(`${this.API}crud/palabra/?palabraAux=${palabraAux}&descripcionAux=${descripcionAux}`, wordData);
+    return this.clienteHttp.post(`${this.API}crud/palabra/video/?palabraAux=${palabraAux}&descripcionAux=${descripcionAux}`, wordData);
   }
 
 
@@ -58,14 +58,14 @@ export class PeticionService {
     return this.getData('crud/caracter/');
   }
 
-  updatePalabraGif(id_palabra: number, palabra_text: string, descripcion: string, palabraData: FormData): Observable<any> {
-    const url = `${this.API}crud/palabra/${id_palabra}/?palabra_text=${palabra_text}&descripcion=${descripcion}`;
+  updatePalabraVideo(id_palabra: number, palabra_text: string, descripcion: string, palabraData: FormData): Observable<any> {
+    const url = `${this.API}crud/palabra/video/${id_palabra}/?palabra_text=${palabra_text}&descripcion=${descripcion}`;
     return this.clienteHttp.put(url, palabraData);
   }
 
-  updateCaracterGif(id_caracter: number, caracter_text: string, caracterData: FormData): Observable<any> {
-    const url = `${this.API}crud/caracter/${id_caracter}/?caracter_text=${caracter_text}`;
-    return this.clienteHttp.put(url, caracterData);
+  updateCaracterVideo(id_caracter: number, caracter_text: string, caracterData: FormData): Observable<any> {
+      const url = `${this.API}crud/caracter/video/${id_caracter}/?caracter_text=${caracter_text}`;
+      return this.clienteHttp.put(url, caracterData);
   }
 
   getDatabaseConfig(): Observable<any> {
@@ -83,6 +83,12 @@ export class PeticionService {
     const urlAPI = `${this.API}logic/analyze-text-videos/?text=${encodeURIComponent(text)}`;
     return this.clienteHttp.post(urlAPI, {}); 
   }
+
+  login(email: string, password: string): Observable<any> {
+    const route = 'crud/login/';
+    return this.postData({ email, password }, route);
+  }
+  
 
    
 }

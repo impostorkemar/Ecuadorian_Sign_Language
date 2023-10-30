@@ -44,7 +44,7 @@
                             [(ngModel)]="selectedDescription" [readonly]="selectedType === 'caracter'"
                             name="description">
                     </div>
-                    <img *ngIf="selectedGifPath" [src]="selectedGifPath" alt="Gif Seleccionado" class="gif-image">
+                    <video *ngIf="selectedGifPath" controls [src]="selectedGifPath" class="video-preview"></video>
 
                     <!-- Sección para mostrar el nombre del GIF -->
                     <div class="mb-3">
@@ -52,13 +52,13 @@
                             <img src="assets/icons/icons8_GIF_20px.png" alt="Icono de Gif"> Gif
                         </label>
                         <div class="mb-3">                            
-                            <input type="file" class="form-control" id="uploadGif" (change)="onFileSelected($event)" name="uploadGif" accept=".gif">
+                            <input type="file" class="form-control" id="uploadVideo" (change)="onFileSelected($event)" name="uploadVideo" accept=".mp4">
                         </div>
                     </div>
                     
                     <!-- Acciones: Editar, Cancelar, Actualizar, Buscar GIF -->
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-primary" (click)="updateGif()">
+                        <button type="button" class="btn btn-primary" (click)="updateVideo()">
                             <img src="assets/icons/icons8_Edit_20px_2.png" alt="Icono de Editar"> Actualizar Gif
                         </button>                        
                         <button type="button" class="btn btn-warning" (click)="onCancelClick()">
