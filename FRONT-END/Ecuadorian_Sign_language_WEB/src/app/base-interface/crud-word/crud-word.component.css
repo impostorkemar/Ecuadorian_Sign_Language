@@ -27,3 +27,24 @@
     background-color: rgb(74, 53, 109) !important;
     border-color: rgb(74, 53, 109) !important;
 }
+
+/* Ajustar colores en pantallas pequeñas */
+@media (max-width: 768px) {
+    /* Cambiar el fondo a un tono más claro */
+    .bg-dark {
+        background-color: rgb(74, 53, 109) !important;
+    }
+
+    /* Cambiar el color del texto en pantalla pequeña */
+    .text-light,
+    .text-dark {
+        color: rgb(255, 255, 255) !important;
+    }
+
+    /* Cambiar el color de fondo del botón en pantalla pequeña */
+    .btn-primary,
+    .btn-primary:hover {
+        background-color: rgb(74, 53, 109) !important;
+        border-color: rgb(74, 53, 109) !important;
+    }
+}

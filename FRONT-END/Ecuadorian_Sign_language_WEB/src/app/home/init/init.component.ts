@@ -56,6 +56,9 @@ export class InitComponent implements OnInit {
   }
 
   async analyzeTextInput() {
+    this.videos = [{ url: '', duration: 0 }];
+    this.currentVideoIndex = 0;
+    this.initialized = false;
     this.initialized = true;
     this.stopVideos();  // Aseguramos que los videos se detengan antes de iniciar una nueva análisis
     this.peticionService.analyzeTextForVideos(this.textInput as string).subscribe(async response => {

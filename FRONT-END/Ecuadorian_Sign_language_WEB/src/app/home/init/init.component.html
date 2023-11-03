@@ -49,13 +49,13 @@
                     <div class="video-display video-border">
                         <!-- Reproductor de video integrado aquí -->
                         <ng-container *ngIf="initialized && videos[currentVideoIndex]">
-                            <video #videoPlayer (ended)="videoEnded()" [src]="videos[currentVideoIndex].url" controls autoplay></video>
-                           <!-- Información sobre el video posicionada en la parte inferior del video -->
                             <div class="video-caption">
                                 {{ getVideoName(videos[currentVideoIndex].url) }}
                             </div>
-                        </ng-container>                        
-                    </div>      
+                            <video #videoPlayer (ended)="videoEnded()" [src]="videos[currentVideoIndex].url" controls autoplay></video>
+                        </ng-container>
+                    </div>
+                          
                 </div>
             </div>
         </div>

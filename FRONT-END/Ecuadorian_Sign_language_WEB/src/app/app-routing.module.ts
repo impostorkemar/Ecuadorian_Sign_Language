@@ -7,12 +7,13 @@ import { CrudWordComponent } from './base-interface/crud-word/crud-word.componen
 import { UpdateWordComponent } from './base-interface/update-word/update-word.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: 'init', pathMatch: 'full'},  
-  {path: 'init', component: InitComponent},
-  {path: 'crud_database', component: CrudDatabaseComponent, canActivate: [AuthGuard], data: {role: 'admin'}},
-  {path: 'crud_word', component: CrudWordComponent, canActivate: [AuthGuard], data: {role: 'admin'}},
-  {path: 'update_word', component: UpdateWordComponent, canActivate: [AuthGuard], data: {role: 'admin'}},
+  { path: '', component: InitComponent },
+  { path: 'crud_database', component: CrudDatabaseComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'crud_word', component: CrudWordComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'update_word', component: UpdateWordComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: '**', redirectTo: '' } // Redirige rutas desconocidas a la ruta principal ('')
 ];
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

@@ -6,7 +6,7 @@ import {Observable} from 'rxjs';
   providedIn: 'root'
 })
 export class PeticionService {
-  public API: string = 'http://34.125.225.26:4200/';
+  public API: string = 'http://34.125.169.178:4200/';
 
   constructor(private clienteHttp: HttpClient) { }
 
