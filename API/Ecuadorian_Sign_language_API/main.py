@@ -28,6 +28,5 @@ app.include_router(caracter_crud, prefix="/crud")
 app.include_router(palabra_crud, prefix="/crud")
 app.include_router(router, prefix="/logic")
 
-app.mount("/gifs", StaticFiles(directory="gifs"), name="gifs")
 app.mount("/videos", StaticFiles(directory="videos"), name="videos")
 
