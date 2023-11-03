@@ -342,6 +342,6 @@ INSERT INTO palabra (palabra,descripcion, video) VALUES ('utilizar','utilizar','
 INSERT INTO palabra (palabra,descripcion, video) VALUES ('vivienda','vivienda','VIVIENDA.mp4');
 INSERT INTO palabra (palabra,descripcion, video) VALUES ('yanomas','yanomas','YANOMAS.mp4');
 
-INSERT INTO `users`( `name`, `email`, `password`) VALUES ('admin','jcajasp2@est.ups.edu.ec','tesis.root1')
+
 
 
