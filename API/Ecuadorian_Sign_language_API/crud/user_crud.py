@@ -20,18 +20,25 @@ user_crud = APIRouter()
 @user_crud.post("/users/", response_model=User, tags=["users"])
 async def create_user(item: User):
     conn = engine.connect()
-    new_item = {
-        "name": item.name,
-        "email": item.email,
-        "password": item.password  # Considera usar hashing antes de guardar contraseñas.
-    }
-    result = conn.execute(users.insert().values(**new_item))
-    item.id = result.inserted_primary_key[0]
-    conn.close()
+    try:
+        new_item = {
+            "name": item.name,
+            "email": item.email,
+            "password": item.password  # Considera usar hashing antes de guardar contraseñas.
+        }
+        result = conn.execute(users.insert().values(**new_item))
+        item.id = result.inserted_primary_key[0]
+        
+        # Realizar commit para guardar los cambios
+        conn.commit()
+    finally:
+        conn.close()
+    
     return item
 
+
 @user_crud.get("/users/", response_model=List[User], tags=["users"])
-async def get_users():
+def get_users():
     conn = engine.connect()
     result = conn.execute(users.select()).fetchall()
     conn.close()
@@ -49,22 +56,38 @@ async def get_user_by_id(user_id: int):
 @user_crud.put("/users/{user_id}", response_model=User, tags=["users"])
 async def update_user(user_id: int, item: User):
     conn = engine.connect()
-    result = conn.execute(users.update().where(users.c.id == user_id).values(
-        name=item.name, email=item.email, password=item.password
-    ))
-    conn.close()
+    try:
+        result = conn.execute(users.update().where(users.c.id == user_id).values(
+            name=item.name, email=item.email, password=item.password
+        ))
+        
+        # Realizar commit para guardar los cambios
+        conn.commit()
+    finally:
+        conn.close()
+    
     if not result.rowcount:
         raise HTTPException(status_code=404, detail="User not found")
+    
     return {**item.dict(), "id": user_id}
+
 
 @user_crud.delete("/users/{user_id}", tags=["users"])
 async def delete_user(user_id: int):
     conn = engine.connect()
-    result = conn.execute(users.delete().where(users.c.id == user_id))
-    conn.close()
+    try:
+        result = conn.execute(users.delete().where(users.c.id == user_id))
+        
+        # Realizar commit para guardar la eliminación
+        conn.commit()
+    finally:
+        conn.close()
+    
     if not result.rowcount:
         raise HTTPException(status_code=404, detail="User not found")
+    
     return {"status": "User deleted successfully"}
+
 
 palabra_crud = APIRouter()
 
