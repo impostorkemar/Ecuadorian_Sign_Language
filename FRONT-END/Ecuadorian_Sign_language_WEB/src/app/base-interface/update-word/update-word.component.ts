@@ -80,12 +80,12 @@ export class UpdateWordComponent implements OnInit {
     if (this.selectedType === 'palabra' && this.wordsList.length > 0) {
         this.itemList = this.wordsList.map(p => p.palabra);
         this.selectedWord = this.itemList[0];
-        this.selectedGifPath = `http://127.0.0.1:8000/videos/palabras/${this.wordsList[0].video}`;
+        this.selectedGifPath = this.peticionService.API + `videos/palabras/${this.wordsList[0].video}`;
         this.gifPath = this.wordsList[0].video;  // Aquí asignas el nombre del archivo
     } else if (this.selectedType === 'caracter' && this.caracterList.length > 0) {
         this.itemList = this.caracterList.map(c => c.caracter);
         this.selectedWord = this.itemList[0];
-        this.selectedGifPath = `http://127.0.0.1:8000/videos/caracteres/${this.caracterList[0].video}`;
+        this.selectedGifPath = this.peticionService.API + `videos/caracteres/${this.caracterList[0].video}`;
         this.gifPath = this.caracterList[0].video;  // Aquí asignas el nombre del archivo
     }
     this.updateDescription();
@@ -95,12 +95,12 @@ export class UpdateWordComponent implements OnInit {
       if (this.selectedType === 'palabra') {
           const selectedWordObj = this.wordsList.find(wordObj => wordObj.palabra === this.selectedWord);
           this.selectedDescription = selectedWordObj ? selectedWordObj.descripcion : '';
-          this.selectedGifPath = `http://127.0.0.1:8000/videos/palabras/${selectedWordObj?.video}`;
+          this.selectedGifPath = this.peticionService.API + `videos/palabras/${selectedWordObj?.video}`;
           this.gifPath = selectedWordObj?.video ?? '';  // Aquí asignas el nombre del archivo
       } else {
           const selectedCaracterObj = this.caracterList.find(carObj => carObj.caracter === this.selectedWord);
           this.selectedDescription = '';
-          this.selectedGifPath = `http://127.0.0.1:8000/videos/caracteres/${selectedCaracterObj?.video}`;
+          this.selectedGifPath = this.peticionService.API + `videos/caracteres/${selectedCaracterObj?.video}`;
           this.gifPath = selectedCaracterObj?.video ?? '';  // Aquí asignas el nombre del archivo
       }
   }

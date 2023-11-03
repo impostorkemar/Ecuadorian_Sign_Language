@@ -1,10 +1,11 @@
 import { HttpClient,HttpHeaders } from '@angular/common/http';
+import { PeticionService } from './peticion.service';
 
 export class HttpPostService {
 
-    private serverUrl = "http://127.0.0.1:8000/";
+    private serverUrl = this.peticionservice.API;
     
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private peticionservice: PeticionService) { }
     
     postData(data: any, route: string) {
         let options = this.createRequestOptions();
