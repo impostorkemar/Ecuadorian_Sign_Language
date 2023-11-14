@@ -128,13 +128,13 @@ export class UpdateWordComponent implements OnInit {
         const file = input.files[0];
         const fileType = file.type;
   
-        // Comprueba si el tipo de archivo es .gif
-        if (fileType === 'video/mp4') {
+        // Comprueba si el tipo de archivo es .webm
+        if (fileType === 'video/webm') {
             this.selectedFile = file;
             // Si deseas actualizar la variable gifPath con el nombre del archivo:
             this.gifPath = file.name;
         } else {
-            this.openDialog('Error', 'Por favor, sube solo archivos .gif');
+            this.openDialog('Error', 'Por favor, sube solo archivos .webm');
             // Reset the input field if needed
             if (input) {
                 input.value = '';

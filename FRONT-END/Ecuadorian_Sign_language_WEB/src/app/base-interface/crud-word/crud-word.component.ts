@@ -31,12 +31,12 @@ export class CrudWordComponent implements OnInit {
           const file = input.files[0];
           const fileType = file.type;
 
-          // Comprueba si el tipo de archivo es .mp4
-        if (fileType === 'video/mp4') {
+          // Comprueba si el tipo de archivo es .webm
+        if (fileType === 'video/webm') {
             this.selectedFile = file;
             // Aquí puedes agregar más lógica si necesitas hacer algo más con el archivo
         } else {
-            this.openDialog('Error', 'Por favor, sube solo archivos .mp4');
+            this.openDialog('Error', 'Por favor, sube solo archivos .webm');
             // Reset the input field if needed
             if (input) {
                 input.value = '';
