@@ -64,18 +64,34 @@ export class InitComponent implements OnInit {
     this.initialized = true;
     this.stopVideos();  // Aseguramos que los videos se detengan antes de iniciar una nueva análisis
     this.peticionService.analyzeTextForVideos(this.textInput as string).subscribe(async response => {
-      //console.log("response",response)
+      // Logica existente
       const newVideos = this.extractVideosFromTokens(response.tokens);
       if (newVideos.length > 0) {
         this.videos = newVideos;
         await this.playVideos();
       }
+      this.translationInProgress = false; // Asegurar que se resetee el estado después de completar la petición
     },
-      (error: any) => {
-        console.error("Hubo un error al analizar el texto", error);
-      });
-    this.translationInProgress = false;
+    (error: any) => {
+      console.error("Hubo un error al analizar el texto", error);
+      this.translationInProgress = false; // Asegurar que se resetee el estado en caso de error
+      this.openErrorDialog(); // Llamada a la función que abre el diálogo de error
+    });
   }
+  
+  openErrorDialog(): void {
+    this.dialog.open(PopupComponent, {
+      width: '300px',
+      data: {
+        title: 'Error',
+        message: 'Ingrese caracteres permitidos',
+        // Puedes agregar más datos si es necesario
+      }
+    });
+  }
+  
+
+  
 
   private async playVideos() {
     if (this.videos.length > 0) {
