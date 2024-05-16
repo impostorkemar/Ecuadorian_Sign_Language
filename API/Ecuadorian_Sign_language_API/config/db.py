@@ -4,7 +4,7 @@ from config.conexion import Conexion
 
 conexion = Conexion()
 
-DATABASE_URL = f"mysql://{conexion.user}:{conexion.pwd}@{conexion.host}/{conexion.db_name}"
+DATABASE_URL = f"mysql://{conexion.user}:{conexion.pwd}@{conexion.host}:3306/{conexion.db_name}"
 
 engine = create_engine(DATABASE_URL)
 meta = MetaData()

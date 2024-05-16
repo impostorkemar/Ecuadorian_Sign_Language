@@ -178,40 +178,55 @@ def find_video_for_token(token_type: str, value: str, base_url: str):
             result = session.query(palabra).filter(palabra.c.palabra == value).first()
             if result:
                 path_to_video = os.path.join(BASE_VIDEO_PATH, "palabras", result.video)
-                duration = video_duration(path_to_video)  # Asegúrate de tener una función similar a gif_duration pero para videos
                 return {
                     "url": f"{base_url}/videos/palabras/{result.video}",
-                    "duration": duration
                 }
             else:
                 videos = []
-                durations = []
                 for char in value:
                     char_result = session.query(caracter).filter(caracter.c.caracter == char).first()
                     if char_result:
                         path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", char_result.video)
-                        duration = video_duration(path_to_video)
                         videos.append(f"{base_url}/videos/caracteres/{char_result.video}")
-                        durations.append(duration)
                     else:
-                        videos.append(f"{base_url}/videos/caracteres/vacio.mp4")
-                        durations.append(0.5)
+                        videos.append(f"{base_url}/videos/caracteres/vacio.webm")  # Asegúrate de que sea .webm
                 return {
                     "urls": videos,
-                    "durations": durations
                 }
 
-        elif token_type in ["LETRA", "DIGITO"]:
+        elif token_type == "LETRA":
             result = session.query(caracter).filter(caracter.c.caracter == value).first()
             if result:
                 path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", result.video)
-                duration = video_duration(path_to_video)
                 return {
                     "url": f"{base_url}/videos/caracteres/{result.video}",
-                    "duration": duration
                 }
+
+        elif token_type == "DIGITO":
+            if len(value) > 1:  # Si el valor tiene más de un dígito
+                videos = []
+                for digit in value:  # Iteramos sobre cada dígito
+                    digit_result = session.query(caracter).filter(caracter.c.caracter == digit).first()
+                    if digit_result:
+                        path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", digit_result.video)
+                        videos.append(f"{base_url}/videos/caracteres/{digit_result.video}")
+                    else:
+                        videos.append(f"{base_url}/videos/caracteres/vacio.webm")  # Asegúrate de que sea .webm
+                return {
+                    "urls": videos,
+                }
+            else:  # Para un solo dígito, la lógica permanece igual
+                result = session.query(caracter).filter(caracter.c.caracter == value).first()
+                if result:
+                    path_to_video = os.path.join(BASE_VIDEO_PATH, "caracteres", result.video)
+                    return {
+                        "url": f"{base_url}/videos/caracteres/{result.video}",
+                    }
     finally:
         session.close()
+
+
+
 
 
 
@@ -225,3 +240,51 @@ def analyze_text_for_videos(text: str, request: Request):
         token["video"] = video_data  # Cambiamos "gif" a "video"
 
     return {"tokens": tokens}
+
+import os
+import subprocess
+
+@router.get("/convert-videos-to-webm/", tags=["logic"])
+def convert_videos_to_webm():
+    # Rutas para la carpeta de palabras
+    input_folder_palabras = "videos/palabras"
+    output_folder_palabras = "videos/palabras"
+    convert_videos(input_folder_palabras, output_folder_palabras)
+
+    # Rutas para la carpeta de caracteres
+    input_folder_caracteres = "videos/caracteres"
+    output_folder_caracteres = "videos/caracteres"
+    convert_videos(input_folder_caracteres, output_folder_caracteres)
+
+    return {"status": "success", "message": "Videos successfully converted to webm"}
+
+def convert_videos(input_folder, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+
+    for filename in os.listdir(input_folder):
+        if filename.endswith(".mp4"):
+            input_path = os.path.join(input_folder, filename)
+            output_filename = filename.replace(".mp4", ".webm")
+            output_path = os.path.join(output_folder, output_filename)
+
+            convert_video_to_webm(input_path, output_path)
+
+def convert_video_to_webm(input_path, output_path):
+    ffmpeg_cmd = [
+    "C:\\ffmpeg\\bin\\ffmpeg.exe",
+    "-i", input_path,
+    "-c:v", "libvpx-vp9",  # Usar códec VP9
+    "-b:v", "1M",
+    "-c:a", "libvorbis",
+    "-b:a", "128k",
+    "-movflags", "+faststart",  # Habilitar carga progresiva
+    output_path
+    ]
+
+
+    try:
+        subprocess.run(ffmpeg_cmd, check=True)
+        print(f"Conversión exitosa de {input_path} a {output_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error al convertir {input_path} a {output_path}. Detalles: {e}")
+
